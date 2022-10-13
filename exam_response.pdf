@@ -1,0 +1,1233 @@
+\documentclass{article}\usepackage[]{graphicx}\usepackage[]{color}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage[sc]{mathpazo}
+\renewcommand{\sfdefault}{lmss}
+\renewcommand{\ttdefault}{lmtt}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2.5cm,bmargin=2.5cm,lmargin=2.5cm,rmargin=2.5cm}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{
+ pdfstartview={XYZ null null 1}}
+
+\makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\topfraction}{0.8}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\floatpagefraction}{0.75}
+
+\makeatother
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+
+
+
+
+
+
+The results below are generated from an R script.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+---
+title: \hlstr{'Name: Loubna Sasso - nyc SQF'}
+author: \hlstr{"| Student number: 20167595 \textbackslash{}n"}
+date: \hlstr{"`r \hlkwd{format}(\hlkwd{Sys.time}(), \hlstr{'%X, %d %B, %Y'})`"}
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+\hlcom{# Originality declaration}
+
+I, \textbackslash{}[**Loubna Sasso**\textbackslash{}], confirm that the work presented in this
+assessment is my own. Where information has been derived from other
+sources, I confirm that this has been indicated in the work.
+
+date: `r \hlkwd{format}(\hlkwd{Sys.time}(), \hlstr{'%d %B, %Y'})`
+
+\hlcom{# Start your response here}
+
+\hlcom{## 01 Initial project scope}
+
+SQF policy has been the subject of racial profiling over the years,
+therefore analyzing where SQF polcies are being implemented across
+different areas of NYC and who they are targeted towards is essential in
+order to help overcome racial profiling by informing policies for
+specific precincts to ensure equality. Moreover Research shows that
+"persons of African and Hispanic descent were stopped more frequently
+than white people, even after controlling for precinct variability and
+race-specific estimates of crime participation." Therefore analyzing
+where these differences occur in different parts on NYC can be
+insightful to implement necessary changes.
+
+The databasets used for this analysis comes from NYC open data and New
+York City Police Department. The New York City Police Department Dataset
+contains 9545 SQF entries contains entries for and 83 different fields.
+The dataset includes important information on the various SQF throughout
+2020, at different months, and time of day as well as the race and
+gender of the people being questioned.
+
+The fields that will be used for this analysis include the latitude and
+longitude coordinates, suspect race description and, month. I will
+analyse the pattern of sqf on black people over the summer period
+(june,july,august,spetember). This process will repeated for 'white
+people' if i have time during the 6 hours given, and a comparison
+between sqf of black vs white people will be made
+
+\hlcom{#### Research Question:}
+
+What patterns off \hlkwd{risk} (SQF) can be observed in the different precincts
+in NYC for black people and how might this pattern change in other
+racial groups?
+
+\hlcom{#### Hypothesis:}
+
+HYPOTHESIS 1 h0: There are no noticeable spacial cluster pattern of SQF
+policy that can be observed for the black people across NYC h1: There
+are noticeable spacial cluster pattern of SQF policy that can be
+observed for the black people across NYC
+
+HYPOTHESIS \hlkwd{2} (moran, getis gerrys) Ho: There are no similarities in
+spatial autocorrelation \hlkwd{of} (SQF) policy between black and white people\textbackslash{}
+H1: There are similarities in spatial autocorrelation \hlkwd{of} (SQF) policy
+between black and white people
+
+\hlcom{#### Data Limitations}
+
+-   Point data also lie outside the boundaries of nyc boundaries that
+    could influence what's happening inside
+-   Is it ethical to include peoples names in the data provided?
+
+\hlcom{#### Analysis Assumptions and focus areas}
+
+-   Assume that points outside NYC boundary have no influence on the
+    outcome of data inside NYC
+-   Focus on black community and then possibly white community if i have
+    time
+-   Assume data is complete regardless of na values
+
+\hlcom{#### Logical Plan}
+
+Preprocess the data: - load in data, filter data to black people being
+questioned and transform it - transform lat and long values to point
+data, make all points distinct, clip all point to NYC boundary - st_join
+points to spatial data: group by, summarize and get a density map
+
+Analyzing the data: - Descriptive statistics of all SQF on black people
+density data: BOX PLOT - Explore clustering of SQF using Point pattern
+analysis: kerney, ripleys and DBSCAN - Explore different Global methods
+to analyze levels Spatial autocorrelation of SQF in NYC - Explore
+different local methods to analyze clustering across communities in NYC
+
+\hlcom{## 02 Load in libraries}
+
+```\{r\}
+\hlkwd{library}(spatstat)
+\hlkwd{library}(here)
+\hlkwd{library}(sp)
+\hlkwd{library}(rgeos)
+\hlkwd{library}(maptools)
+\hlkwd{library}(GISTools)
+\hlkwd{library}(tmap)
+\hlkwd{library}(sf)
+\hlkwd{library}(geojson)
+\hlkwd{library}(geojsonio)
+\hlkwd{library}(tmaptools)
+\hlkwd{library}(stringr)
+\hlkwd{library}(tidyverse)
+\hlkwd{library}(raster)
+\hlkwd{library}(fpc)
+\hlkwd{library}(dbscan)
+\hlkwd{library}(ggplot2)
+\hlkwd{library}(OpenStreetMap)
+\hlkwd{library}(janitor)
+\hlkwd{library}(dplyr)
+\hlkwd{library}(spdep)
+
+\hlkwd{library}(plotly)
+\hlkwd{library}(rgdal)
+\hlkwd{library}(broom)
+\hlkwd{library}(mapview)
+\hlkwd{library}(crosstalk)
+\hlkwd{library}(car)
+\hlkwd{library}(fs)
+\hlkwd{library}(tidypredict)
+\hlkwd{library}(corrr)
+\hlkwd{library}(spatialreg)
+\hlkwd{library}(spdep)
+\hlkwd{library}(spgwr)
+\hlkwd{library}(joineR)
+\hlkwd{library}(units)
+\hlkwd{library}(ggplot2)
+\hlkwd{library}(xlsx)
+\hlkwd{library}(readxl)
+
+
+```
+
+\hlcom{## 03 Load in data +transform Coordinates}
+
+```\{r\}
+
+\hlcom{#read in Police data and transform it}
+police <- \hlkwd{st_read}(here::\hlkwd{here} (\hlstr{"Data"}, \hlstr{"Police Precincts.geojson"})) %>%
+  \hlkwd{st_transform}(., 32618) \hlcom{#2908}
+
+
+\hlcom{#read in sqf data, remove all na values and clean names}
+sqf  <- \hlkwd{read_excel}(here::\hlkwd{here} (\hlstr{"Data"}, \hlstr{"sqf-2020.xlsx"}))%>%
+  \hlkwd{clean_names}()
+
+```
+
+\hlcom{## 04 Initianl Data Cleaning and wrangling}
+
+for sql: -select fields: suspect_race_description, stop_location_x,
+stop_location_x, suspect_arrest_offense, month2 -filter: Black, white,
+white hispanic -drop n/a values -transform
+
+```\{r\}
+
+\hlcom{#1) for sqf csv data i want to:}
+
+\hlcom{#select columns you want. }
+sqf <-  sqf%>%
+  dplyr::\hlkwd{select}(suspect_race_description, stop_location_x, stop_location_y, month2)
+
+
+\hlcom{# first filter only black and drop na vals in lat and long}
+sqf_black <-  sqf%>%
+  \hlkwd{filter}(suspect_race_description == \hlstr{"BLACK"})%>%
+  \hlkwd{filter}(month2 == \hlstr{"June"} | month2 == \hlstr{"July"} | month2 == \hlstr{"August"} | month2 == \hlstr{"September"} )%>%
+  \hlkwd{drop_na}(stop_location_x)%>%
+  \hlkwd{drop_na}(stop_location_y)
+                  
+  
+\hlcom{# first filter only white and drop any na vals in lat and long. this will be used later to compare if i have time}
+sqf_white <-  sqf%>%
+  \hlkwd{filter}(suspect_race_description == \hlstr{"WHITE HISPANIC"} | suspect_race_description == \hlstr{"WHITE"})%>%
+  \hlkwd{filter}(month2 == \hlstr{"June"} | month2 == \hlstr{"July"} | month2 == \hlstr{"August"} | month2 == \hlstr{"September"} )%>%
+  \hlkwd{drop_na}(stop_location_x)%>%
+  \hlkwd{drop_na}(stop_location_y)
+
+  
+
+\hlcom{#2) transform csv sqf_black to point data: st_as sf. }
+sqf_black_sf <- sqf_black%>%
+  \hlkwd{st_as_sf}(.,coords = \hlkwd{c} ( \hlstr{"stop_location_x"}, \hlstr{"stop_location_y"}), crs=2908)%>%
+  \hlkwd{st_transform}(.,32618)
+
+  
+\hlcom{#make all points distinct }
+sqf_black_sf <- sqf_black_sf%>%
+  \hlkwd{distinct}(geometry, .keep_all=T)
+
+
+\hlcom{#3) overlay point data to police districts and clip if required}
+\hlkwd{tmap_mode}(\hlstr{"view"})
+\hlkwd{tm_shape}(police) +
+  \hlkwd{tm_polygons}(col = NA, alpha = 0.5) +
+\hlkwd{tm_shape}(sqf_black_sf) +
+  \hlkwd{tm_dots}(col = \hlstr{"blue"})
+
+
+\hlcom{#clipping point to xxx map boundary}
+sqf_black_sf <- sqf_black_sf [police,]
+
+\hlcom{#plot again to see if they are clipped}
+\hlkwd{tmap_mode}(\hlstr{"view"})
+\hlkwd{tm_shape}(police) +
+  \hlkwd{tm_polygons}(col = NA, alpha = 0.5) +
+\hlkwd{tm_shape}(sqf_black_sf) +
+  \hlkwd{tm_dots}(col = \hlstr{"blue"})
+
+```
+
+\hlcom{## 05 Density map and Descriptive Statistics: sqf black}
+
+lets get an idea of our sqf black data density and distribution
+
+```\{r\}
+
+\hlcom{#1) observe areas of highest and lowest density of sqf-black}
+\hlcom{#could similar  densities in adjacent districts mean there is some degree of clustering happening in these areas?}
+
+
+\hlcom{#st_join point data to the police map to allow for continuous data observation}
+police_sqf_black <- police%>%
+  \hlkwd{st_join}(sqf_black_sf)
+
+\hlcom{#count no. of points in each precinct and add area and density }
+police_sqf_black <- police_sqf_black%>%
+  \hlkwd{add_count}(precinct)%>% \hlcom{#counts the no. of points in each \hlkwd{precinct} (n)}
+  janitor::\hlkwd{clean_names}()%>%
+  \hlkwd{mutate}(area = \hlkwd{st_area}(.))%>% \hlcom{#get area}
+  \hlkwd{mutate} (density = n/area)%>%  \hlcom{#get density}
+  dplyr::\hlkwd{select}(density, area, precinct, n) \hlcom{#narror down the colomns you want}
+
+
+\hlcom{#group by borough}
+police_sqf_black <-  police_sqf_black%>%
+  \hlkwd{group_by}(precinct)%>%
+  \hlkwd{summarise}(density = \hlkwd{first}(density), precinct = \hlkwd{first}(precinct), area = \hlkwd{first}(area), 
+            count = \hlkwd{first}(n))
+
+
+
+\hlcom{#quick choropleth map based on DENSITY  }
+\hlkwd{tm_shape}(police_sqf_black) +
+    \hlkwd{tm_polygons}(\hlstr{"density"},
+        style=\hlstr{"jenks"},
+        palette=\hlstr{"PuOr"},
+        midpoint=NA,
+        popup.vars=\hlkwd{c}(\hlstr{"precinct"}, \hlstr{"density"}),
+        title=\hlstr{"SQF-Black people Density"})
+
+
+
+\hlcom{#2) Box plot}
+
+\hlcom{#first make sure density col is numeric}
+police_sqf_black$density_numeric <- \hlkwd{as.numeric}(police_sqf_black$density)
+
+\hlcom{#boxplot(police_sqf_black$density_numeric)}
+\hlkwd{boxplot}(police_sqf_black$density_numeric,
+main = \hlstr{"SQF-Black people Density Distribution "},
+xlab = \hlstr{"density "},
+ylab = \hlstr{""},
+col = \hlstr{"orange"},
+border = \hlstr{"brown"},
+horizontal = TRUE
+)
+
+
+```
+
+Highest levels of sqf amongst black people are indicated in dark purple
+in precincts across Manhattan, west of Bronx and north of Brooklyn. it
+can also be seen that precincts closer together follow more or less
+similar sqf of black people density which could indicate similarity in
+governance in these precincts that are influenced by neighbouring
+precincts, therefore spatial autocorrelation and clustering occurance.
+
+We can also see the density distribution is positively skewed, meaning
+that most of the precints in Nyc exhibit lower densities in of sqf
+amongst black people, however there are still a few areas with high
+densities. Lets explore further the spatial patterns of these density
+distribution across the different precinct through point pattern
+analysis and later morans I
+
+\hlcom{##06 Cluster Analysis: Point pattern Analysis:}
+
+ANalysis process: 1. create sp and sf objects 2. Density \hlkwd{kernel} (which
+confirms the density map created above) 3. Ripley \hlkwd{K} (over quadrat)
+analysis to test clustering present 4. DBSCAN to show where clusters are
+happening
+
+1.Create sp and ppp objects from the sf point data in order to proceed
+with ripley k and DBSCAN
+
+```\{r\}
+\hlcom{#1) now set a window as the precinct nyc boundary }
+window <- \hlkwd{as.owin}(police)
+\hlkwd{plot}(window)
+
+
+\hlcom{#2A)  Create a sp object for eviction (sf to sp)}
+sqf_black_sp <- sqf_black_sf %>%
+  \hlkwd{as}(., \hlstr{'Spatial'})
+
+\hlcom{#2B) Create a ppp object}
+sqf_black_ppp <- \hlkwd{ppp}(x=sqf_black_sp@coords[,1],
+                          y=sqf_black_sp@coords[,2],
+                          window=window)
+
+\hlcom{#sqf_black_sp@coords[,1]}
+
+
+
+\hlcom{#3) have a look at the ppp object}
+
+sqf_black_ppp %>%
+  \hlkwd{plot}(.,pch=16,cex=0.5, 
+       main=\hlstr{"SQF Black people"})
+
+```
+
+\hlcom{### kernel Density:}
+
+This confirms the density map produced earlier.
+
+```\{r\}
+\hlcom{#uses ppp data }
+sqf_black_ppp %>%
+  \hlkwd{density}(., sigma=500) %>%
+  \hlkwd{plot}()
+
+```
+
+We can see from this map that the that the precincts that fall in
+manhattan , parts of Bronx shows highest densities of SQF concentration,
+similar to the first density diagram produced. Now lets explore further
+if the points exhibit clustering using ripleys k.
+
+\hlcom{### Ripleys k}
+
+"To determining whether a pattern exists in the data is to compare the
+observed distribution of points to an idealised random distribution. If
+the points do not conform to a random distribution, then it is likely
+that there is some unobserved factor or factors which could be causing
+non-random clustering or dispersal to occur" (Adam Dennett and Sam).
+
+Quadrat analysis does not account for different spatial unit sizes such
+the different sized precincts in NYC, therefore to overcome this
+limitation, i will jump straight in to a ripleys k test to check if the
+SQF cases of black people exhibits clustering, This is done by comparing
+the observed distribution of points with the Poisson random model for a
+whole range of different distance radii.
+
+```\{r\}
+
+\hlcom{#using the ppp data, plot the ripleys K}
+Ripleys_K <- sqf_black_ppp%>%
+  \hlkwd{Kest}(., correction=\hlstr{"border"}) %>%
+  \hlkwd{plot}()
+
+
+Kval_global <- \hlkwd{as.data.frame}(\hlkwd{Kest}(sqf_black_ppp, correction = \hlstr{"border"}))
+Kval_global
+
+
+```
+
+From the graph, we can see that for all distances, SQF locations appear
+to be clustered up until a distance of approximately 3000. Ripleys k
+shows us if we have spatial clusters present in our point data, but it
+does not tell us WHERE clusters are occurring. To discover this we can
+use DBSAN
+
+\hlcom{### DBSCAN}
+
+Results of the Ripley's K analysis earlier shows we are getting
+clustering up to a radius of around 3000m, with the largest bulge in the
+graph also being at around 3000m radius . Therefore, 3000m is probably a
+good place to start and we will begin by searching for clusters of at
+least 4. if this distance isnt suitable, i will explore the elbow plot
+and use my own judgement to set eps.
+
+Upon attempting the clusters at 3000, it seems to pick up all the
+points, therefore i have adjuster the eps distance to 900 as per the
+elbow plot. Moreover, having the cluster threshold at 4, you can see
+clusters emerge.
+
+```\{r\}
+
+\hlcom{#first check the coordinate reference system of the this spatial polygon:}
+\hlkwd{st_geometry}(police)
+
+
+\hlcom{#1.extract the points from the 'spatial points (sp)' data frame}
+sqf_black_sp_extract <- sqf_black_sp%>% \hlcom{#takes 2A above}
+  \hlkwd{coordinates}(.)%>%
+  \hlkwd{as.data.frame}()
+
+\hlcom{#2. run the DBSCAN using the extracted sp points: }
+\hlcom{#i choose clustering of eviction to be at 900 and min number of 4 points}
+DB_sqf_black <- sqf_black_sp_extract  %>% 
+  fpc::\hlkwd{dbscan}(.,eps = 900, MinPts = 4) 
+
+\hlcom{#now plot the results}
+\hlkwd{plot}(DB_sqf_black, sqf_black_sp_extract , main = \hlstr{"SQF-Black DBSCAN Output"}, frame = F)
+\hlkwd{plot}(police$geometry, add=T)
+
+
+
+
+\hlcom{#3. lets double check appropriate eps distance with the elbow plot:}
+
+sqf_black_sp_extract%>% \hlcom{#takes the point extracted from sp \hlkwd{object} (1. above)}
+  dbscan::\hlkwd{kNNdistplot}(.,k=4)
+\hlcom{#shows 4000, howveer this seems too large so i'll keep it at 1000 as selected earlier}
+
+
+```
+
+The outcome of the dbsan confirms that clustering of SQF on black people
+seems to follow a similarity in the density distribution mapped earlier.
+Using this map, we can not only confirm there there is clusters of SQF
+on black people happening, but that the highest clusters are occuring in
+the same areas mentioned earlier-manhattan, Brooklyn and Bronx.
+
+Could these precincts be influenced by neighboring areas that could
+perhaps explain their clustering? let explore this spatial
+autocorrelation using morans I.
+
+\hlcom{## 07 Spatial Autocorrelation: SQF Black people}
+
+According to Waldo R. Tobler, "Everything is related to everything else.
+But near things are more related than distant things". Lets investigate
+precinct-level spatial dependency using localized version of morana's I
+in order to see hot spots of where SQF programs on black people are
+happening.
+
+If they exibit spatial autocorrelation then this would mean that
+precinct spatial units are influenced by other neighboring precincts and
+hence may explain potential clusters happening in areas that are
+geographically close.If this is the case, then similar policies for
+neighbouring precincts that can be adopted.
+
+\hlcom{### Spatial weight matrix}
+
+Before performing our clustered analysis, we need to generate a spatial
+weights matrix
+
+```\{r\}
+\hlcom{#1. calculate the centroids of all polygons in NYC}
+centroids_police <- police_sqf_black%>%
+  \hlkwd{st_centroid}()%>%
+  \hlkwd{st_geometry}()
+
+\hlkwd{plot}(centroids_police)
+
+
+\hlcom{#2. generate neighbor lists}
+
+\hlcom{#queen's case neighbors : doesn't take centroids. taken adjacent neighbors.}
+NL_queens <- police_sqf_black %>%   
+  \hlkwd{poly2nb}(., queen=T)
+
+\hlcom{#or k nearest neighbors : take centroids. }
+NL_KNN <-centroids_police %>%  
+  \hlkwd{knearneigh}(., k=4)
+
+NL_KNN <- NL_KNN %>%
+  \hlkwd{knn2nb}()
+
+\hlcom{#now plot them both: Fist take the NL then the centroid of the spatial object}
+\hlkwd{plot}(NL_queens, \hlkwd{st_geometry}(centroids_police), col=\hlstr{"red"})
+\hlkwd{plot}(police_sqf_black$geometry, add=T)
+
+\hlkwd{plot}(NL_KNN, \hlkwd{st_geometry}(centroids_police), col=\hlstr{"blue"})
+\hlcom{#add a map underneath}
+\hlkwd{plot}(police_sqf_black$geometry, add=T)
+
+
+\hlcom{#3. create a spatial weights matrix object from these weights}
+\hlcom{# using row standardization 'w'}
+
+SWM_queens <- NL_queens %>%
+  \hlkwd{nb2listw}(., style=\hlstr{"W"}) 
+
+SWM_knn <-NL_KNN %>%
+  \hlkwd{nb2listw}(., style=\hlstr{"W"})
+```
+
+\hlcom{#### Local Moran's I}
+
+final output map 1:
+
+```\{r\}
+
+\hlkwd{tmap_mode}(\hlstr{"plot"})
+
+\hlcom{#1. Local morans density}
+local_moran_density <-  police_sqf_black %>%
+  \hlkwd{pull}(density_numeric) %>% \hlcom{#column name from police_sqf_black use the density values or count to get local morans}
+  \hlkwd{as.vector}()%>%
+  \hlkwd{localmoran}(., SWM_knn)%>%  \hlcom{#spatial weight matrix of \hlkwd{knn} (generated from before from spatial data)}
+  \hlkwd{as_tibble}()
+  
+
+\hlkwd{slice_head}(local_moran_density, n=5) \hlcom{#view the values}
+
+
+\hlcom{# 2. Copy the I score (column 1) and the z-score sd. (column 4)) back into police_sqf_black data}
+
+police_sqf_black <- police_sqf_black %>%
+  \hlkwd{mutate}(density_I =\hlkwd{as.numeric}(local_moran_density$Ii))%>% \hlcom{#local_moran_density is tibble above, specific col =Ii}
+  \hlkwd{mutate}(density_Iz =\hlkwd{as.numeric}(local_moran_density$Z.Ii))
+
+
+\hlcom{#3.lets map them out:}
+
+\hlcom{#set breaks}
+breaks1<-\hlkwd{c}(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
+
+\hlcom{#set colors}
+MoranColours<- \hlkwd{rev}(\hlkwd{brewer.pal}(8, \hlstr{"RdGy"}))
+
+
+
+\hlkwd{tmap_mode}(\hlstr{"plot"})
+\hlcom{#plot interactive map}
+\hlkwd{tm_shape}(police_sqf_black) +
+  \hlkwd{tm_layout}( title = "Local Moran's I- 
+SQF:Black People")+
+  \hlkwd{tm_layout}(frame = FALSE)+
+  \hlkwd{tm_polygons}(\hlstr{"density_Iz"},
+        style=\hlstr{"fixed"},
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title=\hlstr{"Local Moran's I"},
+        legend.hist= TRUE)+
+  \hlkwd{tm_compass}() +
+  \hlkwd{tm_scale_bar}() +
+  \hlkwd{tm_legend}(position=\hlkwd{c}(1,0.0))+
+  \hlkwd{tm_credits}(\hlstr{"(c) New York City Police Department"}, position=\hlkwd{c}(0.5,0.0))
+
+
+```
+
+The limitation of using local morans i alsone is that it is susceptible
+to shape and sizes of the spatial units therefore in order to overcome
+this issues, this map should be read along side the dbscan map that
+shows spatial clusters.
+
+This local morans I map shows rare cases of the highest hot spots of SQF
+on black people occurring in precincts: 23,24,26,28 and 30. By reading
+this map along with the dbscan cluster analysis, we can see that these
+precincts not only exhibit high clusters of SQF cases on black people
+but also have high influence on each other.
+
+\hlcom{## 08 White People SQF}
+
+-   observe clustering of white people SQF and compare it to black
+    people
+-   Overlay points of of SQF White people to spatial autocorrelation
+    data maps of SQF black
+-   Develop local moran's I map for SQF white people data and compare
+    the spatial autocorrelation
+
+```\{r\}
+
+\hlcom{# first filter only white and drop any na vals in lat and long. this will be used later to compare if i have time}
+sqf_white <-  sqf%>%
+  \hlkwd{filter}(suspect_race_description == \hlstr{"WHITE HISPANIC"} | suspect_race_description == \hlstr{"WHITE"})%>%
+  \hlkwd{filter}(month2 == \hlstr{"June"} | month2 == \hlstr{"July"} | month2 == \hlstr{"August"} | month2 == \hlstr{"September"} )%>%
+  \hlkwd{drop_na}(stop_location_x)%>%
+  \hlkwd{drop_na}(stop_location_y)
+
+  
+
+\hlcom{#2) transform csv sqf_white to point data: st_as sf. }
+sqf_white_sf <- sqf_white%>%
+  \hlkwd{st_as_sf}(.,coords = \hlkwd{c} ( \hlstr{"stop_location_x"}, \hlstr{"stop_location_y"}), crs=2908)%>%
+  \hlkwd{st_transform}(.,32618)
+
+  
+\hlcom{#make all points distinct }
+sqf_white_sf <- sqf_white_sf%>%
+  \hlkwd{distinct}(geometry, .keep_all=T)
+
+
+\hlcom{#3) overlay point data to police districts and clip if required}
+\hlkwd{tmap_mode}(\hlstr{"view"})
+\hlkwd{tm_shape}(police) +
+  \hlkwd{tm_polygons}(col = NA, alpha = 0.5) +
+\hlkwd{tm_shape}(sqf_white_sf) +
+  \hlkwd{tm_dots}(col = \hlstr{"blue"})
+
+
+\hlcom{#clipping point to xxx map boundary}
+sqf_white_sf <- sqf_white_sf[police,]
+
+\hlcom{#plot again to see if they are clipped}
+\hlkwd{tmap_mode}(\hlstr{"view"})
+\hlkwd{tm_shape}(police) +
+  \hlkwd{tm_polygons}(col = NA, alpha = 0.5) +
+\hlkwd{tm_shape}(sqf_white_sf) +
+  \hlkwd{tm_dots}(col = \hlstr{"blue"})
+
+
+
+```
+
+Density map of white people
+
+```\{r\}
+\hlcom{#1) observe areas of highest and lowest density of sqf-white}
+
+
+\hlcom{#st_join point data to the police map to allow for continuous data observation}
+police_sqf_white <- police%>%
+  \hlkwd{st_join}(sqf_white_sf)
+
+\hlcom{#count no. of points in each precinct and add area and density }
+police_sqf_white <- police_sqf_white%>%
+  \hlkwd{add_count}(precinct)%>% \hlcom{#counts the no. of points in each \hlkwd{precinct} (n)}
+  janitor::\hlkwd{clean_names}()%>%
+  \hlkwd{mutate}(area = \hlkwd{st_area}(.))%>% \hlcom{#get area}
+  \hlkwd{mutate} (density = n/area)%>%  \hlcom{#get density}
+  dplyr::\hlkwd{select}(density, area, precinct, n) \hlcom{#narror down the colomns you want}
+
+
+\hlcom{#group by borough}
+police_sqf_white <-  police_sqf_white%>%
+  \hlkwd{group_by}(precinct)%>%
+  \hlkwd{summarise}(density = \hlkwd{first}(density), precinct = \hlkwd{first}(precinct), area = \hlkwd{first}(area), 
+            count = \hlkwd{first}(n))
+
+
+
+\hlcom{#quick choropleth map based on DENSITY  }
+\hlkwd{tm_shape}(police_sqf_white) +
+    \hlkwd{tm_polygons}(\hlstr{"density"},
+        style=\hlstr{"jenks"},
+        palette=\hlstr{"PuOr"},
+        midpoint=NA,
+        popup.vars=\hlkwd{c}(\hlstr{"precinct"}, \hlstr{"density"}),
+        title=\hlstr{"SQF-White people Density"})
+
+```
+
+we can see some slight differences when compared to density of black
+people, however they both show high density in Manhattan. Lets explore
+the clusters of SQF white people in order to make further comparisons.
+
+Cluster analysis: White people
+
+ANalysis process: 1. create sp and sf objects 2. Density \hlkwd{kernel} (which
+confirms the density map created above) 3. Ripley \hlkwd{K} (over quadrat)
+analysis to test clustering present 4. DBSCAN to show where clusters are
+happening
+
+1.Create sp and ppp objects from the sf point data in order to proceed
+with ripley k and DBSCAN
+
+```\{r\}
+\hlcom{#1) now set a window as the precinct nyc boundary }
+window <- \hlkwd{as.owin}(police)
+\hlkwd{plot}(window)
+
+
+\hlcom{#2A)  Create a sp object for eviction (sf to sp)}
+sqf_white_sp <- sqf_white_sf  %>%
+  \hlkwd{as}(., \hlstr{'Spatial'})
+
+\hlcom{#2B) Create a ppp object}
+sqf_white_ppp <- \hlkwd{ppp}(x=sqf_white_sp@coords[,1],
+                          y=sqf_white_sp@coords[,2],
+                          window=window)
+
+\hlcom{#sqf_black_sp@coords[,1]}
+
+
+
+\hlcom{#3) have a look at the ppp object}
+
+sqf_white_ppp %>%
+  \hlkwd{plot}(.,pch=16,cex=0.5, 
+       main=\hlstr{"SQF white people"})
+
+```
+
+\hlcom{### kernel Density:}
+
+This confirms the density map produced earlier.
+
+```\{r\}
+\hlcom{#uses ppp data }
+sqf_white_ppp %>%
+  \hlkwd{density}(., sigma=500) %>%
+  \hlkwd{plot}()
+
+```
+
+We can see from this map that the similar to SQF black people cases, the
+precincts that fall in manhattan and part of Bronx also shows highest
+densities of SQF concentration for white people
+
+\hlcom{### Ripleys k}
+
+```\{r\}
+
+\hlcom{#using the ppp data, plot the ripleys K}
+Ripleys_K <- sqf_white_ppp%>%
+  \hlkwd{Kest}(., correction=\hlstr{"border"}) %>%
+  \hlkwd{plot}()
+
+
+Kval_global <- \hlkwd{as.data.frame}(\hlkwd{Kest}(sqf_black_ppp, correction = \hlstr{"border"}))
+Kval_global
+
+
+```
+
+From the graph, we can see that up to a distance of 2100, SQF locations
+for white people appear to be clustered and from about 2100 to 2400 they
+are dispersed.. Lets perform dbsan
+
+\hlcom{### DBSCAN}
+
+i'll begin with eps of 2100 and adjust if needed.
+
+Upon attempting the clusters at 2100, it seems to pick up all the
+points, therefore i have adjuster the eps distance to \hlkwd{900} (even though
+elbow plot shows 500) i order to match the same distance as black
+people. This will allows a fair comparison between the two.
+
+```\{r\}
+
+\hlcom{#first check the coordinate reference system of the this spatial polygon:}
+\hlkwd{st_geometry}(police)
+
+
+\hlcom{#1.extract the points from the 'spatial points (sp)' data frame}
+sqf_white_sp_extract <- sqf_white_sp%>% 
+  \hlkwd{coordinates}(.)%>%
+  \hlkwd{as.data.frame}()
+
+\hlcom{#2. run the DBSCAN using the extracted sp points: }
+\hlcom{#i choose clustering of eviction to be at 100 and min number of 6 points}
+DB_sqf_white <- sqf_white_sp_extract  %>% 
+  fpc::\hlkwd{dbscan}(.,eps = 900, MinPts = 4) 
+
+\hlcom{#now plot the results}
+\hlkwd{plot}(DB_sqf_white, sqf_white_sp_extract , main = \hlstr{"SQF-White DBSCAN Output"}, frame = F)
+\hlkwd{plot}(police$geometry, add=T)
+
+
+
+
+\hlcom{#3. lets double check appropriate eps distance with the elbow plot:}
+
+sqf_white_sp_extract%>% \hlcom{#takes the point extracted from sp \hlkwd{object} (1. above)}
+  dbscan::\hlkwd{kNNdistplot}(.,k=4)
+\hlcom{#shows 4000, howveer this seems too large so i'll keep it at 1000 as selected earlier}
+
+
+```
+
+The outcome of the dbsan confirms that clustering of SQF on white people
+seems
+
+fOR the same eps distances, SQF clusters of black people are more
+apparent in the precincts that fall inside Brooklyn, However there is a
+similarity in clustering of both black and white SQF cases in Manhattan.
+
+Lets explore the spatial autocorrelation of sqf white people to make a
+comparison.
+
+\hlcom{### Local Morans}
+
+Spatial weight matrix: Before performing our clustered analysis, we need
+to generate a spatial weights matrix
+
+```\{r\}
+\hlcom{#1. calculate the centroids of all polygons in NYC}
+centroids_police_w <- police_sqf_white%>%
+  \hlkwd{st_centroid}()%>%
+  \hlkwd{st_geometry}()
+
+\hlkwd{plot}(centroids_police_w)
+
+
+\hlcom{#2. generate neighbor lists}
+
+\hlcom{#queen's case neighbors : doesn't take centroids. taken adjacent neighbors.}
+NL_queens_W <- police_sqf_white %>%   
+  \hlkwd{poly2nb}(., queen=T)
+
+\hlcom{#or k nearest neighbors : take centroids. }
+NL_KNN_w <-centroids_police_w %>%  
+  \hlkwd{knearneigh}(., k=4)
+
+NL_KNN_w <- NL_KNN_w %>%
+  \hlkwd{knn2nb}()
+
+\hlcom{#now plot them both: Fist take the NL then the centroid of the spatial object}
+\hlkwd{plot}(NL_queens_W, \hlkwd{st_geometry}(centroids_police_w), col=\hlstr{"red"})
+\hlkwd{plot}(police_sqf_white$geometry, add=T)
+
+\hlkwd{plot}(NL_KNN_w, \hlkwd{st_geometry}(centroids_police_w), col=\hlstr{"blue"})
+\hlcom{#add a map underneath}
+\hlkwd{plot}(police_sqf_white$geometry, add=T)
+
+
+\hlcom{#3. create a spatial weights matrix object from these weights}
+\hlcom{# using row standardization 'w'}
+
+SWM_queens_w <- NL_queens_W %>%
+  \hlkwd{nb2listw}(., style=\hlstr{"W"}) 
+
+
+SWM_knn <-NL_KNN %>%
+  \hlkwd{nb2listw}(., style=\hlstr{"W"})
+
+```
+
+\hlcom{#### Local Moran's I}
+
+final output map 2:
+
+```\{r\}
+
+\hlkwd{tmap_mode}(\hlstr{"plot"})
+
+\hlcom{#first make sure density col is numeric}
+police_sqf_white$density_numeric <- \hlkwd{as.numeric}(police_sqf_white$density)
+
+
+
+\hlcom{#1. Local morans density}
+local_moran_density_w <-  police_sqf_white %>%
+  \hlkwd{pull}(density_numeric) %>% \hlcom{#column name from police_sqf_black use the density values or count to get local morans}
+  \hlkwd{as.vector}()%>%
+  \hlkwd{localmoran}(., SWM_knn)%>%  \hlcom{#spatial weight matrix of \hlkwd{knn} (generated from before from spatial data)}
+  \hlkwd{as_tibble}()
+  
+
+\hlkwd{slice_head}(local_moran_density_w, n=5) \hlcom{#view the values}
+
+
+\hlcom{# 2. Copy the I score (column 1) and the z-score sd. (column 4)) back into police_sqf_black data}
+
+police_sqf_white <- police_sqf_white %>%
+  \hlkwd{mutate}(density_I =\hlkwd{as.numeric}(local_moran_density_w$Ii))%>% \hlcom{#local_moran_density is tibble above, specific col =Ii}
+  \hlkwd{mutate}(density_Iz =\hlkwd{as.numeric}(local_moran_density_w$Z.Ii))
+
+
+\hlcom{#3.lets map them out:}
+
+\hlcom{#set breaks}
+breaks1<-\hlkwd{c}(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
+
+\hlcom{#set colors}
+MoranColours<- \hlkwd{rev}(\hlkwd{brewer.pal}(8, \hlstr{"RdGy"}))
+
+
+
+\hlkwd{tmap_mode}(\hlstr{"plot"})
+\hlcom{#plot interactive map}
+\hlkwd{tm_shape}(police_sqf_white) +
+  \hlkwd{tm_layout}( title = "Local Moran's I- 
+SQF:white People")+
+  \hlkwd{tm_layout}(frame = FALSE)+
+  \hlkwd{tm_polygons}(\hlstr{"density_Iz"},
+        style=\hlstr{"fixed"},
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title=\hlstr{"Local Moran's I"},
+        legend.hist= TRUE)+
+  \hlkwd{tm_compass}() +
+  \hlkwd{tm_scale_bar}() +
+  \hlkwd{tm_legend}(position=\hlkwd{c}(1,0.0))+
+  \hlkwd{tm_credits}(\hlstr{"(c) New York City Police Department"}, position=\hlkwd{c}(0.5,0.0))
+
+
+```
+
+final output map 3:
+
+```\{r\}
+
+
+\hlcom{#set breaks}
+breaks1<-\hlkwd{c}(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
+
+\hlcom{#set colors}
+MoranColours<- \hlkwd{rev}(\hlkwd{brewer.pal}(8, \hlstr{"RdGy"}))
+
+
+\hlcom{#map SQF: black people}
+\hlkwd{tmap_mode}(\hlstr{"plot"})
+\hlcom{#plot interactive map}
+tm1 <-  \hlkwd{tm_shape}(police_sqf_black) +
+  \hlkwd{tm_layout}( title = "Local Moran's: 
+Black People")+
+  \hlkwd{tm_polygons}(\hlstr{"density_Iz"},
+        style=\hlstr{"fixed"},
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title=\hlstr{"Local Moran's I SQF:Black People"})+
+  \hlkwd{tm_legend}(show=FALSE)+
+  \hlkwd{tm_layout}(frame=FALSE)
+
+
+
+\hlcom{#map SQF: white people}
+\hlkwd{tmap_mode}(\hlstr{"plot"})
+\hlcom{#plot interactive map}
+tm2 <- \hlkwd{tm_shape}(police_sqf_white) +
+  \hlkwd{tm_layout}( title = "Local Moran's:
+White People")+
+  \hlkwd{tm_polygons}(\hlstr{"density_Iz"},
+        style=\hlstr{"fixed"},
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title=\hlstr{"Local Moran's I"})+
+  \hlkwd{tm_legend}(show=FALSE)+
+  \hlkwd{tm_layout}(frame=FALSE)
+
+
+
+legend1 <- \hlkwd{tm_shape}(police_sqf_black) +
+    \hlkwd{tm_polygons}(\hlstr{"density_Iz"},
+        style=\hlstr{"fixed"},
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title=\hlstr{"SQF:Black people"},
+        legend.hist= FALSE) +
+    \hlkwd{tm_scale_bar}(position=\hlkwd{c}(0.2,0.04), text.size=0.6)+
+    \hlkwd{tm_compass}(north=0, position=\hlkwd{c}(0,0.1))+
+    \hlkwd{tm_layout}(legend.only = TRUE, legend.position=\hlkwd{c}(0.5,0.25),asp=0.1)+
+    \hlkwd{tm_credits}(\hlstr{"(c) New York City Police Department"}, position=\hlkwd{c}(0.0,0.0))
+
+
+
+\hlcom{#map the legend}
+legend <- \hlkwd{tm_shape}(police_sqf_white) +
+    \hlkwd{tm_polygons}(\hlstr{"density_Iz"},
+        style=\hlstr{"fixed"},
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title=\hlstr{"SQF:White people"},
+        legend.hist= FALSE) +
+    \hlkwd{tm_layout}(legend.only = TRUE, legend.position=\hlkwd{c}(0.5,0.25),asp=0.1)
+    
+
+
+
+
+\hlcom{#plot them side by side}
+t=\hlkwd{tmap_arrange}(tm1, tm2, legend1, legend, ncol=2)
+
+
+t
+
+
+
+```
+
+Comparing the 2 maps we can see that some precincts exhibit similarities
+in levels of autocorrelation specifically in staten \hlkwd{island} (1.6-2) and
+manhattan. In general we can see high levels of spatial autocorrelation
+in both maps in precincts inside manhattan which could indicate that
+although theyr are both high, there isnt necessarily racial-profiling
+happening in manhattan.
+
+\hlcom{## 09 Reflection}
+
+The analysis conducted lead us to reach a conclusion that answers the
+research question and both hypothesis
+
+Ripleys k indicated spatial clustering was present In both cases of
+black people and white people.
+
+DBSAN was used to observe clustered pattern and local morans to
+determine hot spots of spatial autocorrelation. The analysis was first
+done for all SQF on suspect black people and results showed that
+clustering was most present in precincts across Manhattan, west of Bronx
+and north of Brooklyn. The clustering performed on SQF of white cases
+showed that for a similar eps value, there were similarities in
+clustering in Manhattan, however sqf clustering of black people were
+higher in Brooklyn which indicates there may be possibilities of racial
+profiling of black people in Brooklyn
+
+This Lead us to confirm H1 for the first hypothesis:There are noticeable
+spacial cluster pattern of SQF policy that can be observed for the black
+people across NYC
+
+Moreover, by cross comparing Morans i of both black and white sqf cases
+showed some precincts exhibit similarities in spatial autocorrelation,
+with highest levels of spatial autocorrelation for both maps in
+precincts inside manhattan. This could indicate there there may be other
+factors such internal governance within these precincts that are causing
+such strong spatial similarities between these precincts.
+
+This confirms H1 in hypothesis 2: H1: There are are similarities in
+spatial autocorrelation \hlkwd{of} (SQF) policy between black and white people
+
+Limitations to the analysis - Ripley's k is sensitive to the boundaries
+of the study area - Addition spatial autocorrelation was not explored
+including gerrys and getis -The eps distance outcome of ripleys K could
+not be used as it was too large and so 900m assumption was set for both
+morans i cases. -NYPD collected the data so there may have been a
+confilict of interest
+
+Policy Making -in areas where there are clusters of SQR on black people
+such as the bronx, policies to ensure that there is no police violence
+can be be implemented. This may include internal trainin of police
+forces within these precincts to ensure that racial profiling and racial
+profiling does not occur.
+
+Further Exploration -clusters over different periods from 2018 compared
+to 2020 to compare changes after black lives matter. -clusters of socio
+economic factors that may influence or be linked to SQF racial cases
+-local regression models for each cluster:localized analysis and
+therefore custom policy making for precinct that exhibit similarities in
+spatial pattern
+
+```\{r\}
+
+```
+\end{alltt}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error: <text>:15:2: unexpected ','\\\#\# 14: \\\#\# 15: I,\\\#\# \ \ \ \ \ \textasciicircum{}}}\end{kframe}
+\end{knitrout}
+
+The R session information (including the OS info, R version and all
+packages used):
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{sessionInfo}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## R version 4.1.2 (2021-11-01)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 19042)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.1252  LC_CTYPE=English_United States.1252   
+## [3] LC_MONETARY=English_United States.1252 LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.1252    
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+##  [1] readxl_1.3.1          xlsx_0.6.5            units_0.7-2          
+##  [4] joineR_1.2.6          survival_3.2-13       spgwr_0.6-34         
+##  [7] spatialreg_1.2-1      Matrix_1.3-4          corrr_0.4.3          
+## [10] tidypredict_0.4.8     fs_1.5.0              car_3.0-12           
+## [13] carData_3.0-4         crosstalk_1.2.0       mapview_2.10.0       
+## [16] broom_0.7.10          rgdal_1.5-27          plotly_4.10.0        
+## [19] spdep_1.1-12          spData_2.0.1          janitor_2.1.0        
+## [22] OpenStreetMap_0.3.4   dbscan_1.1-8          fpc_2.2-9            
+## [25] raster_3.5-2          forcats_0.5.1         dplyr_1.0.7          
+## [28] purrr_0.3.4           readr_2.1.0           tidyr_1.1.4          
+## [31] tibble_3.1.6          ggplot2_3.3.5         tidyverse_1.3.1      
+## [34] stringr_1.4.0         tmaptools_3.1-1       geojsonio_0.9.4      
+## [37] geojson_0.3.4         sf_1.0-4              tmap_3.3-2           
+## [40] GISTools_0.7-4        MASS_7.3-54           RColorBrewer_1.1-2   
+## [43] maptools_1.1-2        rgeos_0.5-8           sp_1.4-6             
+## [46] here_1.0.1            spatstat_2.2-0        spatstat.linnet_2.3-0
+## [49] spatstat.core_2.3-1   rpart_4.1-15          nlme_3.1-153         
+## [52] spatstat.geom_2.3-0   spatstat.data_2.1-0  
+## 
+## loaded via a namespace (and not attached):
+##   [1] utf8_1.2.2              tidyselect_1.1.1        htmlwidgets_1.5.4      
+##   [4] grid_4.1.2              munsell_0.5.0           jqr_1.2.2              
+##   [7] codetools_0.2-18        statmod_1.4.36          withr_2.4.2            
+##  [10] colorspace_2.0-2        highr_0.9               knitr_1.36             
+##  [13] rstudioapi_0.13         stats4_4.1.2            robustbase_0.93-9      
+##  [16] wk_0.5.0                tensor_1.5              rJava_1.0-5            
+##  [19] polyclip_1.10-0         rprojroot_2.0.2         coda_0.19-4            
+##  [22] LearnBayes_2.15.1       vctrs_0.3.8             generics_0.1.1         
+##  [25] xfun_0.28               diptest_0.76-0          R6_2.5.1               
+##  [28] flexmix_2.3-17          spatstat.utils_2.2-0    assertthat_0.2.1       
+##  [31] scales_1.1.1            nnet_7.3-16             gtable_0.3.0           
+##  [34] lwgeom_0.2-8            goftest_1.2-3           rlang_0.4.12           
+##  [37] splines_4.1.2           lazyeval_0.2.2          dichromat_2.0-0        
+##  [40] s2_1.0.7                yaml_2.2.1              abind_1.4-5            
+##  [43] modelr_0.1.8            backports_1.3.0         rsconnect_0.8.25       
+##  [46] tools_4.1.2             ellipsis_0.3.2          jquerylib_0.1.4        
+##  [49] proxy_0.4-26            Rcpp_1.0.7              base64enc_0.1-3        
+##  [52] classInt_0.4-3          deldir_1.0-6            haven_2.4.3            
+##  [55] cluster_2.1.2           leafem_0.1.6            crul_1.2.0             
+##  [58] magrittr_2.0.1          data.table_1.14.2       gmodels_2.18.1         
+##  [61] reprex_2.0.1            hms_1.1.1               xlsxjars_0.6.1         
+##  [64] evaluate_0.14           XML_3.99-0.8            leaflet_2.0.4.1        
+##  [67] mclust_5.4.8            compiler_4.1.2          KernSmooth_2.23-20     
+##  [70] V8_3.6.0                crayon_1.4.2            geojsonsf_2.0.1        
+##  [73] htmltools_0.5.2         mgcv_1.8-38             tzdb_0.2.0             
+##  [76] expm_0.999-6            lubridate_1.8.0         DBI_1.1.1              
+##  [79] dbplyr_2.1.1            boot_1.3-28             cli_3.1.0              
+##  [82] gdata_2.18.0            parallel_4.1.2          pkgconfig_2.0.3        
+##  [85] foreign_0.8-81          terra_1.4-20            spatstat.sparse_2.0-0  
+##  [88] xml2_1.3.2              webshot_0.5.2           rvest_1.0.2            
+##  [91] snakecase_0.11.0        digest_0.6.28           httpcode_0.3.0         
+##  [94] rmarkdown_2.11          cellranger_1.1.0        leafsync_0.1.0         
+##  [97] curl_4.3.2              kernlab_0.9-29          gtools_3.9.2           
+## [100] satellite_1.0.4         modeltools_0.2-23       lifecycle_1.0.1        
+## [103] jsonlite_1.7.2          viridisLite_0.4.0       fansi_0.5.0            
+## [106] pillar_1.6.4            lattice_0.20-45         fastmap_1.1.0          
+## [109] httr_1.4.2              DEoptimR_1.0-9          glue_1.5.0             
+## [112] png_0.1-7               prabclus_2.3-2          leaflet.providers_1.9.0
+## [115] class_7.3-19            stringi_1.7.5           stars_0.5-4            
+## [118] e1071_1.7-9
+\end{verbatim}
+\begin{alltt}
+\hlkwd{Sys.time}\hlstd{()}
+\end{alltt}
+\begin{verbatim}
+## [1] "2022-02-02 13:20:39 GMT"
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+
+\end{document}

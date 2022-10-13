@@ -1,0 +1,1048 @@
+---
+title: 'Name: Loubna Sasso - nyc SQF'
+author: "| Student number: 20167595 \n"
+date: "`r format(Sys.time(), '%X, %d %B, %Y')`"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+editor_options:
+  markdown:
+    wrap: 72
+---
+
+# Originality declaration
+
+I, \[**Loubna Sasso**\], confirm that the work presented in this
+assessment is my own. Where information has been derived from other
+sources, I confirm that this has been indicated in the work.
+
+date: `r format(Sys.time(), '%d %B, %Y')`
+
+# Start your response here
+
+## 01 Initial project scope
+
+SQF policy has been the subject of racial profiling over the years,
+therefore analyzing where SQF polcies are being implemented across
+different areas of NYC and who they are targeted towards is essential in
+order to help overcome racial profiling by informing policies for
+specific precincts to ensure equality. Moreover Research shows that
+"persons of African and Hispanic descent were stopped more frequently
+than white people, even after controlling for precinct variability and
+race-specific estimates of crime participation." Therefore analyzing
+where these differences occur in different parts on NYC can be
+insightful to implement necessary changes.
+
+The databasets used for this analysis comes from NYC open data and New
+York City Police Department. The New York City Police Department Dataset
+contains 9545 SQF entries contains entries for and 83 different fields.
+The dataset includes important information on the various SQF throughout
+2020, at different months, and time of day as well as the race and
+gender of the people being questioned.
+
+The fields that will be used for this analysis include the latitude and
+longitude coordinates, suspect race description and, month. I will
+analyse the pattern of sqf on black people over the summer period
+(june,july,august,spetember). This process will repeated for 'white
+people' if i have time during the 6 hours given, and a comparison
+between sqf of black vs white people will be made
+
+#### Research Question:
+
+What patterns off risk (SQF) can be observed in the different precincts
+in NYC for black people and how might this pattern change in other
+racial groups?
+
+#### Hypothesis:
+
+HYPOTHESIS 1 h0: There are no noticeable spacial cluster pattern of SQF
+policy that can be observed for the black people across NYC h1: There
+are noticeable spacial cluster pattern of SQF policy that can be
+observed for the black people across NYC
+
+HYPOTHESIS 2 (moran, getis gerrys) Ho: There are no similarities in
+spatial autocorrelation of (SQF) policy between black and white people\
+H1: There are similarities in spatial autocorrelation of (SQF) policy
+between black and white people
+
+#### Data Limitations
+
+-   Point data also lie outside the boundaries of nyc boundaries that
+    could influence what's happening inside
+-   Is it ethical to include peoples names in the data provided?
+
+#### Analysis Assumptions and focus areas
+
+-   Assume that points outside NYC boundary have no influence on the
+    outcome of data inside NYC
+-   Focus on black community and then possibly white community if i have
+    time
+-   Assume data is complete regardless of na values
+
+#### Logical Plan
+
+Preprocess the data: - load in data, filter data to black people being
+questioned and transform it - transform lat and long values to point
+data, make all points distinct, clip all point to NYC boundary - st_join
+points to spatial data: group by, summarize and get a density map
+
+Analyzing the data: - Descriptive statistics of all SQF on black people
+density data: BOX PLOT - Explore clustering of SQF using Point pattern
+analysis: kerney, ripleys and DBSCAN - Explore different Global methods
+to analyze levels Spatial autocorrelation of SQF in NYC - Explore
+different local methods to analyze clustering across communities in NYC
+
+## 02 Load in libraries
+
+```{r}
+library(spatstat)
+library(here)
+library(sp)
+library(rgeos)
+library(maptools)
+library(GISTools)
+library(tmap)
+library(sf)
+library(geojson)
+library(geojsonio)
+library(tmaptools)
+library(stringr)
+library(tidyverse)
+library(raster)
+library(fpc)
+library(dbscan)
+library(ggplot2)
+library(OpenStreetMap)
+library(janitor)
+library(dplyr)
+library(spdep)
+
+library(plotly)
+library(rgdal)
+library(broom)
+library(mapview)
+library(crosstalk)
+library(car)
+library(fs)
+library(tidypredict)
+library(corrr)
+library(spatialreg)
+library(spdep)
+library(spgwr)
+library(joineR)
+library(units)
+library(ggplot2)
+library(xlsx)
+library(readxl)
+
+
+```
+
+## 03 Load in data +transform Coordinates
+
+```{r}
+
+#read in Police data and transform it
+police <- st_read(here::here ("Data", "Police Precincts.geojson")) %>%
+  st_transform(., 32618) #2908
+
+
+#read in sqf data, remove all na values and clean names
+sqf  <- read_excel(here::here ("Data", "sqf-2020.xlsx"))%>%
+  clean_names()
+
+```
+
+## 04 Initianl Data Cleaning and wrangling
+
+for sql: -select fields: suspect_race_description, stop_location_x,
+stop_location_x, suspect_arrest_offense, month2 -filter: Black, white,
+white hispanic -drop n/a values -transform
+
+```{r}
+
+#1) for sqf csv data i want to:
+
+#select columns you want. 
+sqf <-  sqf%>%
+  dplyr::select(suspect_race_description, stop_location_x, stop_location_y, month2)
+
+
+# first filter only black and drop na vals in lat and long
+sqf_black <-  sqf%>%
+  filter(suspect_race_description == "BLACK")%>%
+  filter(month2 == "June" | month2 == "July" | month2 == "August" | month2 == "September" )%>%
+  drop_na(stop_location_x)%>%
+  drop_na(stop_location_y)
+                  
+  
+# first filter only white and drop any na vals in lat and long. this will be used later to compare if i have time
+sqf_white <-  sqf%>%
+  filter(suspect_race_description == "WHITE HISPANIC" | suspect_race_description == "WHITE")%>%
+  filter(month2 == "June" | month2 == "July" | month2 == "August" | month2 == "September" )%>%
+  drop_na(stop_location_x)%>%
+  drop_na(stop_location_y)
+
+  
+
+#2) transform csv sqf_black to point data: st_as sf. 
+sqf_black_sf <- sqf_black%>%
+  st_as_sf(.,coords = c ( "stop_location_x", "stop_location_y"), crs=2908)%>%
+  st_transform(.,32618)
+
+  
+#make all points distinct 
+sqf_black_sf <- sqf_black_sf%>%
+  distinct(geometry, .keep_all=T)
+
+
+#3) overlay point data to police districts and clip if required
+tmap_mode("view")
+tm_shape(police) +
+  tm_polygons(col = NA, alpha = 0.5) +
+tm_shape(sqf_black_sf) +
+  tm_dots(col = "blue")
+
+
+#clipping point to xxx map boundary
+sqf_black_sf <- sqf_black_sf [police,]
+
+#plot again to see if they are clipped
+tmap_mode("view")
+tm_shape(police) +
+  tm_polygons(col = NA, alpha = 0.5) +
+tm_shape(sqf_black_sf) +
+  tm_dots(col = "blue")
+
+```
+
+## 05 Density map and Descriptive Statistics: sqf black
+
+lets get an idea of our sqf black data density and distribution
+
+```{r}
+
+#1) observe areas of highest and lowest density of sqf-black
+#could similar  densities in adjacent districts mean there is some degree of clustering happening in these areas?
+
+
+#st_join point data to the police map to allow for continuous data observation
+police_sqf_black <- police%>%
+  st_join(sqf_black_sf)
+
+#count no. of points in each precinct and add area and density 
+police_sqf_black <- police_sqf_black%>%
+  add_count(precinct)%>% #counts the no. of points in each precinct (n)
+  janitor::clean_names()%>%
+  mutate(area = st_area(.))%>% #get area
+  mutate (density = n/area)%>%  #get density
+  dplyr::select(density, area, precinct, n) #narror down the colomns you want
+
+
+#group by borough
+police_sqf_black <-  police_sqf_black%>%
+  group_by(precinct)%>%
+  summarise(density = first(density), precinct = first(precinct), area = first(area), 
+            count = first(n))
+
+
+
+#quick choropleth map based on DENSITY  
+tm_shape(police_sqf_black) +
+    tm_polygons("density",
+        style="jenks",
+        palette="PuOr",
+        midpoint=NA,
+        popup.vars=c("precinct", "density"),
+        title="SQF-Black people Density")
+
+
+
+#2) Box plot
+
+#first make sure density col is numeric
+police_sqf_black$density_numeric <- as.numeric(police_sqf_black$density)
+
+#boxplot(police_sqf_black$density_numeric)
+boxplot(police_sqf_black$density_numeric,
+main = "SQF-Black people Density Distribution ",
+xlab = "density ",
+ylab = "",
+col = "orange",
+border = "brown",
+horizontal = TRUE
+)
+
+
+```
+
+Highest levels of sqf amongst black people are indicated in dark purple
+in precincts across Manhattan, west of Bronx and north of Brooklyn. it
+can also be seen that precincts closer together follow more or less
+similar sqf of black people density which could indicate similarity in
+governance in these precincts that are influenced by neighbouring
+precincts, therefore spatial autocorrelation and clustering occurance.
+
+We can also see the density distribution is positively skewed, meaning
+that most of the precints in Nyc exhibit lower densities in of sqf
+amongst black people, however there are still a few areas with high
+densities. Lets explore further the spatial patterns of these density
+distribution across the different precinct through point pattern
+analysis and later morans I
+
+##06 Cluster Analysis: Point pattern Analysis:
+
+ANalysis process: 1. create sp and sf objects 2. Density kernel (which
+confirms the density map created above) 3. Ripley K (over quadrat)
+analysis to test clustering present 4. DBSCAN to show where clusters are
+happening
+
+1.Create sp and ppp objects from the sf point data in order to proceed
+with ripley k and DBSCAN
+
+```{r}
+#1) now set a window as the precinct nyc boundary 
+window <- as.owin(police)
+plot(window)
+
+
+#2A)  Create a sp object for eviction (sf to sp)
+sqf_black_sp <- sqf_black_sf %>%
+  as(., 'Spatial')
+
+#2B) Create a ppp object
+sqf_black_ppp <- ppp(x=sqf_black_sp@coords[,1],
+                          y=sqf_black_sp@coords[,2],
+                          window=window)
+
+#sqf_black_sp@coords[,1]
+
+
+
+#3) have a look at the ppp object
+
+sqf_black_ppp %>%
+  plot(.,pch=16,cex=0.5, 
+       main="SQF Black people")
+
+```
+
+### kernel Density:
+
+This confirms the density map produced earlier.
+
+```{r}
+#uses ppp data 
+sqf_black_ppp %>%
+  density(., sigma=500) %>%
+  plot()
+
+```
+
+We can see from this map that the that the precincts that fall in
+manhattan , parts of Bronx shows highest densities of SQF concentration,
+similar to the first density diagram produced. Now lets explore further
+if the points exhibit clustering using ripleys k.
+
+### Ripleys k
+
+"To determining whether a pattern exists in the data is to compare the
+observed distribution of points to an idealised random distribution. If
+the points do not conform to a random distribution, then it is likely
+that there is some unobserved factor or factors which could be causing
+non-random clustering or dispersal to occur" (Adam Dennett and Sam).
+
+Quadrat analysis does not account for different spatial unit sizes such
+the different sized precincts in NYC, therefore to overcome this
+limitation, i will jump straight in to a ripleys k test to check if the
+SQF cases of black people exhibits clustering, This is done by comparing
+the observed distribution of points with the Poisson random model for a
+whole range of different distance radii.
+
+```{r}
+
+#using the ppp data, plot the ripleys K
+Ripleys_K <- sqf_black_ppp%>%
+  Kest(., correction="border") %>%
+  plot()
+
+
+Kval_global <- as.data.frame(Kest(sqf_black_ppp, correction = "border"))
+Kval_global
+
+
+```
+
+From the graph, we can see that for all distances, SQF locations appear
+to be clustered up until a distance of approximately 3000. Ripleys k
+shows us if we have spatial clusters present in our point data, but it
+does not tell us WHERE clusters are occurring. To discover this we can
+use DBSAN
+
+### DBSCAN
+
+Results of the Ripley's K analysis earlier shows we are getting
+clustering up to a radius of around 3000m, with the largest bulge in the
+graph also being at around 3000m radius . Therefore, 3000m is probably a
+good place to start and we will begin by searching for clusters of at
+least 4. if this distance isnt suitable, i will explore the elbow plot
+and use my own judgement to set eps.
+
+Upon attempting the clusters at 3000, it seems to pick up all the
+points, therefore i have adjuster the eps distance to 900 as per the
+elbow plot. Moreover, having the cluster threshold at 4, you can see
+clusters emerge.
+
+```{r}
+
+#first check the coordinate reference system of the this spatial polygon:
+st_geometry(police)
+
+
+#1.extract the points from the 'spatial points (sp)' data frame
+sqf_black_sp_extract <- sqf_black_sp%>% #takes 2A above
+  coordinates(.)%>%
+  as.data.frame()
+
+#2. run the DBSCAN using the extracted sp points: 
+#i choose clustering of eviction to be at 900 and min number of 4 points
+DB_sqf_black <- sqf_black_sp_extract  %>% 
+  fpc::dbscan(.,eps = 900, MinPts = 4) 
+
+#now plot the results
+plot(DB_sqf_black, sqf_black_sp_extract , main = "SQF-Black DBSCAN Output", frame = F)
+plot(police$geometry, add=T)
+
+
+
+
+#3. lets double check appropriate eps distance with the elbow plot:
+
+sqf_black_sp_extract%>% #takes the point extracted from sp object (1. above)
+  dbscan::kNNdistplot(.,k=4)
+#shows 4000, howveer this seems too large so i'll keep it at 1000 as selected earlier
+
+
+```
+
+The outcome of the dbsan confirms that clustering of SQF on black people
+seems to follow a similarity in the density distribution mapped earlier.
+Using this map, we can not only confirm there there is clusters of SQF
+on black people happening, but that the highest clusters are occuring in
+the same areas mentioned earlier-manhattan, Brooklyn and Bronx.
+
+Could these precincts be influenced by neighboring areas that could
+perhaps explain their clustering? let explore this spatial
+autocorrelation using morans I.
+
+## 07 Spatial Autocorrelation: SQF Black people
+
+According to Waldo R. Tobler, "Everything is related to everything else.
+But near things are more related than distant things". Lets investigate
+precinct-level spatial dependency using localized version of morana's I
+in order to see hot spots of where SQF programs on black people are
+happening.
+
+If they exibit spatial autocorrelation then this would mean that
+precinct spatial units are influenced by other neighboring precincts and
+hence may explain potential clusters happening in areas that are
+geographically close.If this is the case, then similar policies for
+neighbouring precincts that can be adopted.
+
+### Spatial weight matrix
+
+Before performing our clustered analysis, we need to generate a spatial
+weights matrix
+
+```{r}
+#1. calculate the centroids of all polygons in NYC
+centroids_police <- police_sqf_black%>%
+  st_centroid()%>%
+  st_geometry()
+
+plot(centroids_police)
+
+
+#2. generate neighbor lists
+
+#queen's case neighbors : doesn't take centroids. taken adjacent neighbors.
+NL_queens <- police_sqf_black %>%   
+  poly2nb(., queen=T)
+
+#or k nearest neighbors : take centroids. 
+NL_KNN <-centroids_police %>%  
+  knearneigh(., k=4)
+
+NL_KNN <- NL_KNN %>%
+  knn2nb()
+
+#now plot them both: Fist take the NL then the centroid of the spatial object
+plot(NL_queens, st_geometry(centroids_police), col="red")
+plot(police_sqf_black$geometry, add=T)
+
+plot(NL_KNN, st_geometry(centroids_police), col="blue")
+#add a map underneath
+plot(police_sqf_black$geometry, add=T)
+
+
+#3. create a spatial weights matrix object from these weights
+# using row standardization 'w'
+
+SWM_queens <- NL_queens %>%
+  nb2listw(., style="W") 
+
+SWM_knn <-NL_KNN %>%
+  nb2listw(., style="W")
+```
+
+#### Local Moran's I
+
+final output map 1:
+
+```{r}
+
+tmap_mode("plot")
+
+#1. Local morans density
+local_moran_density <-  police_sqf_black %>%
+  pull(density_numeric) %>% #column name from police_sqf_black use the density values or count to get local morans
+  as.vector()%>%
+  localmoran(., SWM_knn)%>%  #spatial weight matrix of knn (generated from before from spatial data)
+  as_tibble()
+  
+
+slice_head(local_moran_density, n=5) #view the values
+
+
+# 2. Copy the I score (column 1) and the z-score sd. (column 4)) back into police_sqf_black data
+
+police_sqf_black <- police_sqf_black %>%
+  mutate(density_I =as.numeric(local_moran_density$Ii))%>% #local_moran_density is tibble above, specific col =Ii
+  mutate(density_Iz =as.numeric(local_moran_density$Z.Ii))
+
+
+#3.lets map them out:
+
+#set breaks
+breaks1<-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
+
+#set colors
+MoranColours<- rev(brewer.pal(8, "RdGy"))
+
+
+
+tmap_mode("plot")
+#plot interactive map
+tm_shape(police_sqf_black) +
+  tm_layout( title = "Local Moran's I- 
+SQF:Black People")+
+  tm_layout(frame = FALSE)+
+  tm_polygons("density_Iz",
+        style="fixed",
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title="Local Moran's I",
+        legend.hist= TRUE)+
+  tm_compass() +
+  tm_scale_bar() +
+  tm_legend(position=c(1,0.0))+
+  tm_credits("(c) New York City Police Department", position=c(0.5,0.0))
+
+
+```
+
+The limitation of using local morans i alsone is that it is susceptible
+to shape and sizes of the spatial units therefore in order to overcome
+this issues, this map should be read along side the dbscan map that
+shows spatial clusters.
+
+This local morans I map shows rare cases of the highest hot spots of SQF
+on black people occurring in precincts: 23,24,26,28 and 30. By reading
+this map along with the dbscan cluster analysis, we can see that these
+precincts not only exhibit high clusters of SQF cases on black people
+but also have high influence on each other.
+
+## 08 White People SQF
+
+-   observe clustering of white people SQF and compare it to black
+    people
+-   Overlay points of of SQF White people to spatial autocorrelation
+    data maps of SQF black
+-   Develop local moran's I map for SQF white people data and compare
+    the spatial autocorrelation
+
+```{r}
+
+# first filter only white and drop any na vals in lat and long. this will be used later to compare if i have time
+sqf_white <-  sqf%>%
+  filter(suspect_race_description == "WHITE HISPANIC" | suspect_race_description == "WHITE")%>%
+  filter(month2 == "June" | month2 == "July" | month2 == "August" | month2 == "September" )%>%
+  drop_na(stop_location_x)%>%
+  drop_na(stop_location_y)
+
+  
+
+#2) transform csv sqf_white to point data: st_as sf. 
+sqf_white_sf <- sqf_white%>%
+  st_as_sf(.,coords = c ( "stop_location_x", "stop_location_y"), crs=2908)%>%
+  st_transform(.,32618)
+
+  
+#make all points distinct 
+sqf_white_sf <- sqf_white_sf%>%
+  distinct(geometry, .keep_all=T)
+
+
+#3) overlay point data to police districts and clip if required
+tmap_mode("view")
+tm_shape(police) +
+  tm_polygons(col = NA, alpha = 0.5) +
+tm_shape(sqf_white_sf) +
+  tm_dots(col = "blue")
+
+
+#clipping point to xxx map boundary
+sqf_white_sf <- sqf_white_sf[police,]
+
+#plot again to see if they are clipped
+tmap_mode("view")
+tm_shape(police) +
+  tm_polygons(col = NA, alpha = 0.5) +
+tm_shape(sqf_white_sf) +
+  tm_dots(col = "blue")
+
+
+
+```
+
+Density map of white people
+
+```{r}
+#1) observe areas of highest and lowest density of sqf-white
+
+
+#st_join point data to the police map to allow for continuous data observation
+police_sqf_white <- police%>%
+  st_join(sqf_white_sf)
+
+#count no. of points in each precinct and add area and density 
+police_sqf_white <- police_sqf_white%>%
+  add_count(precinct)%>% #counts the no. of points in each precinct (n)
+  janitor::clean_names()%>%
+  mutate(area = st_area(.))%>% #get area
+  mutate (density = n/area)%>%  #get density
+  dplyr::select(density, area, precinct, n) #narror down the colomns you want
+
+
+#group by borough
+police_sqf_white <-  police_sqf_white%>%
+  group_by(precinct)%>%
+  summarise(density = first(density), precinct = first(precinct), area = first(area), 
+            count = first(n))
+
+
+
+#quick choropleth map based on DENSITY  
+tm_shape(police_sqf_white) +
+    tm_polygons("density",
+        style="jenks",
+        palette="PuOr",
+        midpoint=NA,
+        popup.vars=c("precinct", "density"),
+        title="SQF-White people Density")
+
+```
+
+we can see some slight differences when compared to density of black
+people, however they both show high density in Manhattan. Lets explore
+the clusters of SQF white people in order to make further comparisons.
+
+Cluster analysis: White people
+
+ANalysis process: 1. create sp and sf objects 2. Density kernel (which
+confirms the density map created above) 3. Ripley K (over quadrat)
+analysis to test clustering present 4. DBSCAN to show where clusters are
+happening
+
+1.Create sp and ppp objects from the sf point data in order to proceed
+with ripley k and DBSCAN
+
+```{r}
+#1) now set a window as the precinct nyc boundary 
+window <- as.owin(police)
+plot(window)
+
+
+#2A)  Create a sp object for eviction (sf to sp)
+sqf_white_sp <- sqf_white_sf  %>%
+  as(., 'Spatial')
+
+#2B) Create a ppp object
+sqf_white_ppp <- ppp(x=sqf_white_sp@coords[,1],
+                          y=sqf_white_sp@coords[,2],
+                          window=window)
+
+#sqf_black_sp@coords[,1]
+
+
+
+#3) have a look at the ppp object
+
+sqf_white_ppp %>%
+  plot(.,pch=16,cex=0.5, 
+       main="SQF white people")
+
+```
+
+### kernel Density:
+
+This confirms the density map produced earlier.
+
+```{r}
+#uses ppp data 
+sqf_white_ppp %>%
+  density(., sigma=500) %>%
+  plot()
+
+```
+
+We can see from this map that the similar to SQF black people cases, the
+precincts that fall in manhattan and part of Bronx also shows highest
+densities of SQF concentration for white people
+
+### Ripleys k
+
+```{r}
+
+#using the ppp data, plot the ripleys K
+Ripleys_K <- sqf_white_ppp%>%
+  Kest(., correction="border") %>%
+  plot()
+
+
+Kval_global <- as.data.frame(Kest(sqf_black_ppp, correction = "border"))
+Kval_global
+
+
+```
+
+From the graph, we can see that up to a distance of 2100, SQF locations
+for white people appear to be clustered and from about 2100 to 2400 they
+are dispersed.. Lets perform dbsan
+
+### DBSCAN
+
+i'll begin with eps of 2100 and adjust if needed.
+
+Upon attempting the clusters at 2100, it seems to pick up all the
+points, therefore i have adjuster the eps distance to 900 (even though
+elbow plot shows 500) i order to match the same distance as black
+people. This will allows a fair comparison between the two.
+
+```{r}
+
+#first check the coordinate reference system of the this spatial polygon:
+st_geometry(police)
+
+
+#1.extract the points from the 'spatial points (sp)' data frame
+sqf_white_sp_extract <- sqf_white_sp%>% 
+  coordinates(.)%>%
+  as.data.frame()
+
+#2. run the DBSCAN using the extracted sp points: 
+#i choose clustering of eviction to be at 100 and min number of 6 points
+DB_sqf_white <- sqf_white_sp_extract  %>% 
+  fpc::dbscan(.,eps = 900, MinPts = 4) 
+
+#now plot the results
+plot(DB_sqf_white, sqf_white_sp_extract , main = "SQF-White DBSCAN Output", frame = F)
+plot(police$geometry, add=T)
+
+
+
+
+#3. lets double check appropriate eps distance with the elbow plot:
+
+sqf_white_sp_extract%>% #takes the point extracted from sp object (1. above)
+  dbscan::kNNdistplot(.,k=4)
+#shows 4000, howveer this seems too large so i'll keep it at 1000 as selected earlier
+
+
+```
+
+The outcome of the dbsan confirms that clustering of SQF on white people
+seems
+
+fOR the same eps distances, SQF clusters of black people are more
+apparent in the precincts that fall inside Brooklyn, However there is a
+similarity in clustering of both black and white SQF cases in Manhattan.
+
+Lets explore the spatial autocorrelation of sqf white people to make a
+comparison.
+
+### Local Morans
+
+Spatial weight matrix: Before performing our clustered analysis, we need
+to generate a spatial weights matrix
+
+```{r}
+#1. calculate the centroids of all polygons in NYC
+centroids_police_w <- police_sqf_white%>%
+  st_centroid()%>%
+  st_geometry()
+
+plot(centroids_police_w)
+
+
+#2. generate neighbor lists
+
+#queen's case neighbors : doesn't take centroids. taken adjacent neighbors.
+NL_queens_W <- police_sqf_white %>%   
+  poly2nb(., queen=T)
+
+#or k nearest neighbors : take centroids. 
+NL_KNN_w <-centroids_police_w %>%  
+  knearneigh(., k=4)
+
+NL_KNN_w <- NL_KNN_w %>%
+  knn2nb()
+
+#now plot them both: Fist take the NL then the centroid of the spatial object
+plot(NL_queens_W, st_geometry(centroids_police_w), col="red")
+plot(police_sqf_white$geometry, add=T)
+
+plot(NL_KNN_w, st_geometry(centroids_police_w), col="blue")
+#add a map underneath
+plot(police_sqf_white$geometry, add=T)
+
+
+#3. create a spatial weights matrix object from these weights
+# using row standardization 'w'
+
+SWM_queens_w <- NL_queens_W %>%
+  nb2listw(., style="W") 
+
+
+SWM_knn <-NL_KNN %>%
+  nb2listw(., style="W")
+
+```
+
+#### Local Moran's I
+
+final output map 2:
+
+```{r}
+
+tmap_mode("plot")
+
+#first make sure density col is numeric
+police_sqf_white$density_numeric <- as.numeric(police_sqf_white$density)
+
+
+
+#1. Local morans density
+local_moran_density_w <-  police_sqf_white %>%
+  pull(density_numeric) %>% #column name from police_sqf_black use the density values or count to get local morans
+  as.vector()%>%
+  localmoran(., SWM_knn)%>%  #spatial weight matrix of knn (generated from before from spatial data)
+  as_tibble()
+  
+
+slice_head(local_moran_density_w, n=5) #view the values
+
+
+# 2. Copy the I score (column 1) and the z-score sd. (column 4)) back into police_sqf_black data
+
+police_sqf_white <- police_sqf_white %>%
+  mutate(density_I =as.numeric(local_moran_density_w$Ii))%>% #local_moran_density is tibble above, specific col =Ii
+  mutate(density_Iz =as.numeric(local_moran_density_w$Z.Ii))
+
+
+#3.lets map them out:
+
+#set breaks
+breaks1<-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
+
+#set colors
+MoranColours<- rev(brewer.pal(8, "RdGy"))
+
+
+
+tmap_mode("plot")
+#plot interactive map
+tm_shape(police_sqf_white) +
+  tm_layout( title = "Local Moran's I- 
+SQF:white People")+
+  tm_layout(frame = FALSE)+
+  tm_polygons("density_Iz",
+        style="fixed",
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title="Local Moran's I",
+        legend.hist= TRUE)+
+  tm_compass() +
+  tm_scale_bar() +
+  tm_legend(position=c(1,0.0))+
+  tm_credits("(c) New York City Police Department", position=c(0.5,0.0))
+
+
+```
+
+final output map 3:
+
+```{r}
+
+
+#set breaks
+breaks1<-c(-1000,-2.58,-1.96,-1.65,1.65,1.96,2.58,1000)
+
+#set colors
+MoranColours<- rev(brewer.pal(8, "RdGy"))
+
+
+#map SQF: black people
+tmap_mode("plot")
+#plot interactive map
+tm1 <-  tm_shape(police_sqf_black) +
+  tm_layout( title = "Local Moran's: 
+Black People")+
+  tm_polygons("density_Iz",
+        style="fixed",
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title="Local Moran's I SQF:Black People")+
+  tm_legend(show=FALSE)+
+  tm_layout(frame=FALSE)
+
+
+
+#map SQF: white people
+tmap_mode("plot")
+#plot interactive map
+tm2 <- tm_shape(police_sqf_white) +
+  tm_layout( title = "Local Moran's:
+White People")+
+  tm_polygons("density_Iz",
+        style="fixed",
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title="Local Moran's I")+
+  tm_legend(show=FALSE)+
+  tm_layout(frame=FALSE)
+
+
+
+legend1 <- tm_shape(police_sqf_black) +
+    tm_polygons("density_Iz",
+        style="fixed",
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title="SQF:Black people",
+        legend.hist= FALSE) +
+    tm_scale_bar(position=c(0.2,0.04), text.size=0.6)+
+    tm_compass(north=0, position=c(0,0.1))+
+    tm_layout(legend.only = TRUE, legend.position=c(0.5,0.25),asp=0.1)+
+    tm_credits("(c) New York City Police Department", position=c(0.0,0.0))
+
+
+
+#map the legend
+legend <- tm_shape(police_sqf_white) +
+    tm_polygons("density_Iz",
+        style="fixed",
+        breaks=breaks1,
+        palette=MoranColours,
+        midpoint=NA,
+        title="SQF:White people",
+        legend.hist= FALSE) +
+    tm_layout(legend.only = TRUE, legend.position=c(0.5,0.25),asp=0.1)
+    
+
+
+
+
+#plot them side by side
+t=tmap_arrange(tm1, tm2, legend1, legend, ncol=2)
+
+
+t
+
+
+
+```
+
+Comparing the 2 maps we can see that some precincts exhibit similarities
+in levels of autocorrelation specifically in staten island (1.6-2) and
+manhattan. In general we can see high levels of spatial autocorrelation
+in both maps in precincts inside manhattan which could indicate that
+although theyr are both high, there isnt necessarily racial-profiling
+happening in manhattan.
+
+## 09 Reflection
+
+The analysis conducted lead us to reach a conclusion that answers the
+research question and both hypothesis
+
+Ripleys k indicated spatial clustering was present In both cases of
+black people and white people.
+
+DBSAN was used to observe clustered pattern and local morans to
+determine hot spots of spatial autocorrelation. The analysis was first
+done for all SQF on suspect black people and results showed that
+clustering was most present in precincts across Manhattan, west of Bronx
+and north of Brooklyn. The clustering performed on SQF of white cases
+showed that for a similar eps value, there were similarities in
+clustering in Manhattan, however sqf clustering of black people were
+higher in Brooklyn which indicates there may be possibilities of racial
+profiling of black people in Brooklyn
+
+This Lead us to confirm H1 for the first hypothesis:There are noticeable
+spacial cluster pattern of SQF policy that can be observed for the black
+people across NYC
+
+Moreover, by cross comparing Morans i of both black and white sqf cases
+showed some precincts exhibit similarities in spatial autocorrelation,
+with highest levels of spatial autocorrelation for both maps in
+precincts inside manhattan. This could indicate there there may be other
+factors such internal governance within these precincts that are causing
+such strong spatial similarities between these precincts.
+
+This confirms H1 in hypothesis 2: H1: There are are similarities in
+spatial autocorrelation of (SQF) policy between black and white people
+
+Limitations to the analysis - Ripley's k is sensitive to the boundaries
+of the study area - Addition spatial autocorrelation was not explored
+including gerrys and getis -The eps distance outcome of ripleys K could
+not be used as it was too large and so 900m assumption was set for both
+morans i cases. -NYPD collected the data so there may have been a
+confilict of interest
+
+Policy Making -in areas where there are clusters of SQR on black people
+such as the bronx, policies to ensure that there is no police violence
+can be be implemented. This may include internal trainin of police
+forces within these precincts to ensure that racial profiling and racial
+profiling does not occur.
+
+Further Exploration -clusters over different periods from 2018 compared
+to 2020 to compare changes after black lives matter. -clusters of socio
+economic factors that may influence or be linked to SQF racial cases
+-local regression models for each cluster:localized analysis and
+therefore custom policy making for precinct that exhibit similarities in
+spatial pattern
+
+```{r}
+
+
+
+library(rmarkdown)
+render("exam_response.Rmd", "pdf_document")
+
+```
